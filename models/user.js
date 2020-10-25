@@ -8,16 +8,20 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 2,
     maxlength: 30,
+    default: 'Жак-Ив Кусто',
+
   },
   about: {
     type: String,
     required: true,
     minlength: 2,
     maxlength: 30,
+    default: 'Исследователь океана',
   },
   avatar: {
     type: String,
     required: true,
+    default: 'https://img.joinfo.ua/i/2019/06/o/5cffa39f10702.jpg',
     minlength: 2,
     validate: {
       validator(link) {
@@ -25,7 +29,6 @@ const userSchema = new mongoose.Schema({
           link,
         );
       },
-      message: (props) => `${props.value} ссылка не прошла валидацию.`,
     },
   },
   email: {
@@ -36,7 +39,6 @@ const userSchema = new mongoose.Schema({
       validator(email) {
         return validator.isEmail(email);
       },
-      message: (props) => `${props.value} почта не прошла валидацию.`,
     },
   },
   password: {

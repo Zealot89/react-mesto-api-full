@@ -1,10 +1,10 @@
 /* eslint-disable linebreak-style */
 require('dotenv').config();
 const { errors } = require('celebrate');
-
+const cors = require('cors');
 const express = require('express');
 const mongoose = require('mongoose');
-// const { celebrate, Joi } = require('celebrate');
+
 const bodyParser = require('body-parser');
 const rateLimit = require('express-rate-limit');
 const { login, createUser } = require('./controllers/users.js');
@@ -30,18 +30,13 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
   useUnifiedTopology: true,
 });
-// app.use((req, res, next) => {
-//  req.user = {
-//    _id: '5f67e10f80ad2b4a78fabbaf',
-//  };
-//
-//  next();
-// });
+
+app.use(cors());
 app.use(limit);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// после ревью можно удалить
+// краш-тест
 app.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Сервер сейчас упадёт');

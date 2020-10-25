@@ -1,7 +1,4 @@
-/* eslint-disable no-undef */
-/* eslint-disable no-unused-vars */
 /* eslint-disable no-underscore-dangle */
-
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
@@ -11,26 +8,14 @@ const BadRequestError = require('../errors/bad-request-err');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   User.find({})
     .then((data) => {
       res.status(200).send({ data });
     }).catch(next);
-  // .catch(() => {
-  //  throw new NotFoundError('Запрашиваемый ресурс не найден');
-  //   const ERROR_CODE = 404;
-  //
-  //   if (err.name === 'CastError') {
-  //    res
-  //      .status(ERROR_CODE)
-  //      .send({ message: 'Запрашиваемый ресурс не найден' });
-  //   } else {
-  //    res.status(500).send({ message: 'Ошибка на сервере' });
-  //   }
-  // });
 };
 
-const getUserById = (req, res) => {
+const getUserById = (req, res, next) => {
   User.findById(req.params._id)
     .orFail(new Error('Not Found'))
     .then((data) => {
@@ -38,55 +23,34 @@ const getUserById = (req, res) => {
     })
     .catch(() => {
       throw new NotFoundError('Пользователь не найден');
-    //  const ERROR_CODE = 404;
-      //
-    //  if (err.name === 'CastError' || err.message === 'Not Found') {
-    //    res.status(ERROR_CODE).send({ message: 'пользователь не найден' });
-    //  } else {
-    //    res.status(500).send({ message: 'Ошибка на сервере' });
-    //  }
     })
     .catch(next);
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  bcrypt.hash(password, 10)
-    .then((hash) => {
-      User.create({
-        name, about, avatar, email, password: hash,
-      });
-    })
 
-    .then((data) => {
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
+
+    .then((newUser) => {
       res.send({
-        _id: data._id,
-        name: data.name,
-        about: data.about,
-        avatar: data.avatar,
-        email: data.email,
+        _id: newUser._id,
+        name: newUser.name,
+        about: newUser.about,
+        avatar: newUser.avatar,
+        email: newUser.email,
       });
     }).catch(() => {
       throw new BadRequestError('переданы некорректные данные в метод создания пользователя');
     })
     .catch(next);
-  // .catch((err) => {
-  //  const ERROR_CODE = 400;
-  //  if (err.name === 'ValidationError') {
-  //    res
-  //      .status(ERROR_CODE)
-  //      .send({
-  //        message:
-  //          'переданы некорректные данные в метод создания пользователя',
-  //      });
-  //  } else {
-  //    res.status(500).send({ message: 'Ошибка на сервере' });
-  //  }
-  // });
 };
-const updateUserInfo = (req, res) => {
+const updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .orFail(new Error('CastError'))
@@ -96,22 +60,8 @@ const updateUserInfo = (req, res) => {
       throw new NotFoundError('Пользователь с таким Id не найден');
     })
     .catch(next);
-  // .catch((err) => {
-  //  const ERROR_CODE = 404;
-  //  if (err.message === 'CastError') {
-  //    console.log(req);
-  //    res
-  //      .status(ERROR_CODE)
-  //      .send({
-  //        message:
-  //        'Пользователь с таким Id не найден',
-  //      });
-  //  } else {
-  //    res.status(500).send({ message: 'Ошибка на сервере' });
-  //  }
-  // });
 };
-const updateUserAvatar = (req, res) => {
+const updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .orFail(new Error('CastError'))
@@ -121,19 +71,6 @@ const updateUserAvatar = (req, res) => {
       throw new NotFoundError('Пользователь с таким Id не найден');
     })
     .catch(next);
-  // .catch((err) => {
-  //  const ERROR_CODE = 404;
-  //  if (err.message === 'CastError') {
-  //    res
-  //      .status(ERROR_CODE)
-  //      .send({
-  //        message:
-  //        'Пользователь с таким Id не найден',
-  //      });
-  //  } else {
-  //    res.status(500).send({ message: 'Ошибка на сервере' });
-  //  }
-  // });
 };
 
 function login(req, res, next) {
@@ -143,9 +80,6 @@ function login(req, res, next) {
   }).catch((err) => {
     // ошибка аутентификации
     throw new AuthError(err.message);
-    // res
-    //  .status(401)
-    //  .send({ message: err.message });
   }).catch(next);
 }
 

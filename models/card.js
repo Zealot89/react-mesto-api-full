@@ -14,7 +14,6 @@ const cardSchema = mongoose.Schema({
       validator(link) {
         return /https?:\/\/(www\.)?[a-zA-Z0-9-@#$%:._=+~&*\\]{1,333}\.[0-9A-Za-z]{1,4}\b([a-zA-Z0-9-@#$%:._=//()+~&*\\]*)/.test(link);
       },
-      message: (props) => `${props.value} ссылка не прошла валидацию.`,
     },
   },
   owner: {
