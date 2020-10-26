@@ -7,7 +7,7 @@ const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-request-err');
 
-const getCard = (req, res) => {
+const getCard = (req, res, next) => {
   Card.find({})
     .then((data) => {
       res.status(200).send({ data });
@@ -17,7 +17,7 @@ const getCard = (req, res) => {
     .catch(next);
 };
 
-const addCard = (req, res) => {
+const addCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({
     name,
@@ -32,7 +32,7 @@ const addCard = (req, res) => {
     .catch(next);
 };
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(req.params.id)
     .orFail(new Error('Not Found'))
     .then((card) => res.send({ data: card })).catch(() => {
@@ -40,7 +40,7 @@ const deleteCard = (req, res) => {
     })
     .catch(next);
 };
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true },
   ).orFail(new Error('ValidationError'))
@@ -49,7 +49,7 @@ const likeCard = (req, res) => {
     })
     .catch(next);
 };
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .orFail(new Error('ValidationError'))
     .then((card) => res.send(card)).catch(() => {

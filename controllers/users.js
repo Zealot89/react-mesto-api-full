@@ -5,6 +5,7 @@ const User = require('../models/user');
 const AuthError = require('../errors/auth-err');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-request-err');
+const ConflictError = require('../errors/conflict-err');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -45,7 +46,10 @@ const createUser = (req, res, next) => {
         avatar: newUser.avatar,
         email: newUser.email,
       });
-    }).catch(() => {
+    }).catch((error) => {
+      if (error.name === 'MongoError' || error.code === 11000) {
+        throw new ConflictError('переданы некорректные данные в метод создания пользователя');
+      }
       throw new BadRequestError('переданы некорректные данные в метод создания пользователя');
     })
     .catch(next);
@@ -80,7 +84,8 @@ function login(req, res, next) {
   }).catch((err) => {
     // ошибка аутентификации
     throw new AuthError(err.message);
-  }).catch(next);
+  })
+    .catch(next);
 }
 
 module.exports = {
