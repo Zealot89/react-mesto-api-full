@@ -2,10 +2,10 @@
 const userRouter = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const {
-  // login,
+
   getUser,
   getUserById,
-  // createUser,
+
   updateUserInfo,
   updateUserAvatar,
 } = require('../controllers/users');
@@ -21,7 +21,7 @@ userRouter.get('/users/:_id', celebrate({
     _id: Joi.string().alphanum().length(24).hex(),
   }),
 }), getUserById);
-// userRouter.post('/users', createUser);
+
 userRouter.patch('/users/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
@@ -36,7 +36,5 @@ userRouter.patch('/users/me/avatar', celebrate({
 
   }),
 }), updateUserAvatar);
-// userRouter.post('/signin', login);
-// userRouter.post('/signup', createUser);
 
 module.exports = userRouter;

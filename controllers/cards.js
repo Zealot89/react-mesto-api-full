@@ -33,7 +33,7 @@ const addCard = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.id)
+  Card.findByIdAndRemove(req.params._id)
     .orFail(new Error('Not Found'))
     .then((card) => res.send({ data: card })).catch(() => {
       throw new NotFoundError('Переданы некорректные данные в метод удаления карточки');
